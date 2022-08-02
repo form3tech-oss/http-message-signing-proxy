@@ -20,9 +20,6 @@ The proxy requires `--config` flag, which point to the config file. See [configu
 ## Configuration
 
 ```yaml
-# URL where the proxy should forward the request to. It can be a server or another proxy.
-upstreamTarget: "https://api.form3.tech/v1"
-
 # HTTP server config
 server:
   # Listening port
@@ -36,21 +33,25 @@ server:
     # Location of the proxy's private key, if SSL is enabled
     keyFilePath: "/etc/ssl/private/private.key"
 
-# Request signing config
-signer:
-  # The key id stored on remote server that mapped to the public key
-  keyId: ""
-  # Location of the private key which will be used to sign requests
-  keyFilePath: ""
-  # The algorithm used to create a digest for body content, can be either SHA-256 or SHA-512
-  bodyDigestAlgo: ""
-  # The algorithm used to hash the signature, can be either SHA-256 or SHA-512
-  signatureHashAlgo: ""
-  # List of headers to create signature from 
-  signatureHeaders: 
-    - (request-target)
-    - host
-    - date
+# Request forward proxy config
+proxy:
+  # URL where the proxy should forward the request to. It can be a server or another proxy.
+  upstreamTarget: "https://api.form3.tech/v1"
+  # Request signing config
+  signer:
+    # The key id stored on remote server that mapped to the public key
+    keyId: ""
+    # Location of the private key which will be used to sign requests
+    keyFilePath: ""
+    # The algorithm used to create a digest for body content, can be either SHA-256 or SHA-512
+    bodyDigestAlgo: ""
+    # The algorithm used to hash the signature, can be either SHA-256 or SHA-512
+    signatureHashAlgo: ""
+    # List of headers to create signature from 
+    signatureHeaders: 
+      - (request-target)
+      - host
+      - date
 
 # Log config
 log:
