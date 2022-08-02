@@ -1,0 +1,18 @@
+target: ""
+
+server:
+  port: 8080
+  tls:
+    enable: true
+    certFilePath: ""
+    keyFilePath: ""
+
+signer:
+  keyId: ""
+  keyFilePath: ""
+  bodyDigestAlgo: ""
+  signatureHashAlgo: ""
+  signatureHeaders: []
+
+log:
+  level: info
