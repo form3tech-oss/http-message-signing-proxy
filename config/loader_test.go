@@ -126,6 +126,9 @@ func TestLoadConfig(t *testing.T) {
 				KeyFilePath:  "/etc/ssl/private/private.key",
 			},
 		},
+		Log: LogConfig{
+			Level: "debug",
+		},
 	}
 
 	configFile := "config_test.yaml"

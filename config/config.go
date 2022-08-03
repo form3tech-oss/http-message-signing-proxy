@@ -3,6 +3,7 @@ package config
 type Config struct {
 	Proxy  ProxyConfig  `mapstructure:"proxy"`
 	Server ServerConfig `mapstructure:"server"`
+	Log    LogConfig    `mapstructure:"log"`
 }
 
 type ServerConfig struct {
@@ -27,4 +28,8 @@ type SignerConfig struct {
 	BodyDigestAlgo    string   `mapstructure:"bodyDigestAlgo"`
 	SignatureHashAlgo string   `mapstructure:"signatureHashAlgo"`
 	SignatureHeaders  []string `mapstructure:"signatureHeaders"`
+}
+
+type LogConfig struct {
+	Level string `mapstructure:"level"`
 }
