@@ -19,3 +19,4 @@ proxy:
 
 log:
   level: info
+  format: json

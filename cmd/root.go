@@ -2,10 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/form3tech-oss/https-signing-proxy/config"
+	"github.com/form3tech-oss/https-signing-proxy/logger"
 	"github.com/form3tech-oss/https-signing-proxy/proxy"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +14,7 @@ func Execute() {
 	rootCmd := NewRootCmd()
 	err := rootCmd.Execute()
 	if err != nil {
-		os.Exit(1)
+		logrus.WithError(err).Fatal("failed to start server")
 	}
 }
 
@@ -29,7 +30,11 @@ func NewRootCmd() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to load config: %w", err)
 			}
-			fmt.Printf("%+v\n", *cfg)
+
+			err = logger.Configure(cfg.Log)
+			if err != nil {
+				return fmt.Errorf("failed to configure logger: %w", err)
+			}
 
 			signingProxy, err := proxy.NewProxy(cfg.Proxy)
 			if err != nil {

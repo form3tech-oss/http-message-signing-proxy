@@ -127,7 +127,8 @@ func TestLoadConfig(t *testing.T) {
 			},
 		},
 		Log: LogConfig{
-			Level: "debug",
+			Level:  "debug",
+			Format: "json",
 		},
 	}
 
