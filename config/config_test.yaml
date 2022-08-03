@@ -1,0 +1,21 @@
+server:
+  port: 8080
+  tls:
+    enable: true
+    certFilePath: "/etc/ssl/certs/cert.crt"
+    keyFilePath: "/etc/ssl/private/private.key"
+
+proxy:
+  upstreamTarget: "https://api.form3.tech/v1"
+  signer:
+    keyId: "6f33b219-137c-467e-9a61-f61040a03363"
+    keyFilePath: "/etc/form3/private/private.key"
+    bodyDigestAlgo: "SHA-256"
+    signatureHashAlgo: "SHA-256"
+    signatureHeaders:
+      - (request-target)
+      - host
+      - date
+
+log:
+  level: info
