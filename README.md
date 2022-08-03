@@ -57,3 +57,29 @@ proxy:
 log:
   level: info
 ```
+
+## Configuration override
+
+One can override any `string` field (list field override is not supported) with `--set` flag or environment variable.
+
+### Override config using `--set` flag
+
+To override specific fields, `--set key=value` flag can be set multiple times.
+For example, `proxy.signer.keyId` and `log.level` in the yaml file above can be overridden by: 
+
+```shell
+./signing-proxy --config <config_file_path> \
+  --set proxy.signer.keyid=5099392e-3040-40f9-ac70-ce66a9ee0ed6 \
+  --set log.level=debug
+```
+
+### Override config using env var
+
+A `a.b.c` field can be automatically overridden by setting a `A_B_C` env var 
+(all capitalised and dots replaced by underscore).
+For example, `proxy.signer.keyId` and `proxy.signer.bodyDigestAlgo` in the yaml file above can be overridden by: 
+
+```shell
+export PROXY_SIGNER_KEYID=5099392e-3040-40f9-ac70-ce66a9ee0ed6
+export PROXY_SIGNER_BODYDIGESTALGO=SHA-512
+```
