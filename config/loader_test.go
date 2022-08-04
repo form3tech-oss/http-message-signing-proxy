@@ -111,10 +111,14 @@ func TestLoadConfig(t *testing.T) {
 				KeyFilePath:       "/etc/form3/private/private.key",
 				BodyDigestAlgo:    "SHA-512",
 				SignatureHashAlgo: "SHA-256",
-				SignatureHeaders: []string{
-					"(request-target)",
-					"host",
-					"date",
+				Headers: HeadersConfig{
+					IncludeDigest:        true,
+					IncludeRequestTarget: true,
+					SignatureHeaders: []string{
+						"host",
+						"date",
+						"content-length",
+					},
 				},
 			},
 		},

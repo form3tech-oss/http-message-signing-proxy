@@ -12,10 +12,13 @@ proxy:
     keyFilePath: "/etc/form3/private/private.key"
     bodyDigestAlgo: "SHA-256"
     signatureHashAlgo: "SHA-256"
-    signatureHeaders:
-      - (request-target)
-      - host
-      - date
+    headers:
+      includeDigest: true
+      includeRequestTarget: true
+      signatureHeaders:
+        - host
+        - date
+        - content-length
 
 log:
   level: info

@@ -23,11 +23,17 @@ type SSLConfig struct {
 }
 
 type SignerConfig struct {
-	KeyId             string   `mapstructure:"keyId"`
-	KeyFilePath       string   `mapstructure:"keyFilePath"`
-	BodyDigestAlgo    string   `mapstructure:"bodyDigestAlgo"`
-	SignatureHashAlgo string   `mapstructure:"signatureHashAlgo"`
-	SignatureHeaders  []string `mapstructure:"signatureHeaders"`
+	KeyId             string        `mapstructure:"keyId"`
+	KeyFilePath       string        `mapstructure:"keyFilePath"`
+	BodyDigestAlgo    string        `mapstructure:"bodyDigestAlgo"`
+	SignatureHashAlgo string        `mapstructure:"signatureHashAlgo"`
+	Headers           HeadersConfig `mapstructure:"headers"`
+}
+
+type HeadersConfig struct {
+	IncludeDigest        bool     `mapstructure:"includeDigest"`
+	IncludeRequestTarget bool     `mapstructure:"includeRequestTarget"`
+	SignatureHeaders     []string `mapstructure:"signatureHeaders"`
 }
 
 type LogConfig struct {
