@@ -47,11 +47,20 @@ proxy:
     bodyDigestAlgo: "SHA-256"
     # The algorithm used to hash the signature, can be either SHA-256 or SHA-512
     signatureHashAlgo: "SHA-256"
-    # List of headers to create signature from 
-    signatureHeaders: 
-      - (request-target)
-      - host
-      - date
+    # Signature headers config
+    headers:
+      # For PUT and POST request, whether a digest header should be included.
+      includeDigest: true
+      # Whether a special (request-target) header should be included.
+      includeRequestTarget: true
+      # List of headers to create signature from, only those which present in the request will be added. 
+      # However, at least one must be specified in the request. 
+      # For example, a GET request does not have content-length header, 
+      # so the proxy will not include content-length to the signature.
+      signatureHeaders: 
+        - host
+        - date
+        - content-length
 
 # Log config
 log:
