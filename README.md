@@ -40,13 +40,13 @@ proxy:
   # Request signing config
   signer:
     # The key id stored on remote server that mapped to the public key
-    keyId: ""
+    keyId: "27781930-f2d0-463e-b6cf-0ed0ec0d8dd9"
     # Location of the private key which will be used to sign requests
-    keyFilePath: ""
+    keyFilePath: "/etc/form3/private/private.key"
     # The algorithm used to create a digest for body content, can be either SHA-256 or SHA-512
-    bodyDigestAlgo: ""
+    bodyDigestAlgo: "SHA-256"
     # The algorithm used to hash the signature, can be either SHA-256 or SHA-512
-    signatureHashAlgo: ""
+    signatureHashAlgo: "SHA-256"
     # List of headers to create signature from 
     signatureHeaders: 
       - (request-target)
@@ -55,14 +55,17 @@ proxy:
 
 # Log config
 log:
+  # Log level
   level: info
+  # Log format, can be either 'text' or 'json'
+  format: json
 ```
 
-## Configuration override
+### Configuration override
 
 One can override any `string` field (list field override is not supported) with `--set` flag or environment variable.
 
-### Override config using `--set` flag
+#### Override config using `--set` flag
 
 To override specific fields, `--set key=value` flag can be set multiple times.
 For example, `proxy.signer.keyId` and `log.level` in the yaml file above can be overridden by: 
@@ -73,7 +76,7 @@ For example, `proxy.signer.keyId` and `log.level` in the yaml file above can be 
   --set log.level=debug
 ```
 
-### Override config using env var
+#### Override config using env var
 
 A `a.b.c` field can be automatically overridden by setting a `A_B_C` env var 
 (all capitalised and dots replaced by underscore).
@@ -83,3 +86,15 @@ For example, `proxy.signer.keyId` and `proxy.signer.bodyDigestAlgo` in the yaml 
 export PROXY_SIGNER_KEYID=5099392e-3040-40f9-ac70-ce66a9ee0ed6
 export PROXY_SIGNER_BODYDIGESTALGO=SHA-512
 ```
+
+## Proxying
+
+Any request coming in the proxy will be signed and forwarded to the upstream target, meaning the host will be replaced 
+by the target host and a signature header will be added, the rest of the request is kept as-is.
+
+Additionally, there are two endpoints explicitly exposed by the proxy:
+
+- `GET /-/health` for health check.
+- `GET /-/prometheus` for metrics.
+
+Incoming requests like above will not be signed nor forwarded to the upstream target.
