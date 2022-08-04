@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	kvRegex = regexp.MustCompile("([a-zA-Z\\d_.]+)=(.*)")
+	kvRegex = regexp.MustCompile(`([a-zA-Z\\d_.]+)=(.*)`)
 )
 
 type KV map[string]interface{}

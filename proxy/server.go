@@ -2,7 +2,6 @@ package proxy
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -24,10 +23,6 @@ type Server struct {
 func NewServer(cfg config.ServerConfig, handler Handler) *Server {
 	router := gin.New()
 	router.Use(gin.Recovery())
-
-	router.NoRoute(func(c *gin.Context) {
-		c.JSON(http.StatusNotFound, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
-	})
 
 	router.GET("/-/health", handler.Health)
 	router.GET("/-/prometheus", func(c *gin.Context) {
@@ -59,14 +54,14 @@ func (s *Server) Start() {
 			log.Info("starting server without TLS")
 			err = s.ListenAndServe()
 		}
-		if err != nil && errors.Is(err, http.ErrServerClosed) {
+		if err != nil {
 			log.Fatalf("failed to start server: %s", err)
 		}
 	}()
 
 	// Wait for interrupt signal to gracefully shutdown the server with
 	// a timeout of 5 seconds.
-	quit := make(chan os.Signal)
+	quit := make(chan os.Signal, 1)
 	// kill (no param) default send syscall.SIGTERM
 	// kill -2 is syscall.SIGINT
 	// kill -9 is syscall.SIGKILL but can't be caught, so don't need to add it

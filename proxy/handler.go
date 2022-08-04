@@ -1,12 +1,8 @@
 package proxy
 
 import (
-	"fmt"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 
-	"github.com/form3tech-oss/http-message-signing-proxy/config"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,12 +12,14 @@ type Handler interface {
 }
 
 type handler struct {
-	proxy *httputil.ReverseProxy
+	proxy     *ReverseProxy
+	reqSigner RequestSigner
 }
 
-func NewHandler(proxy *httputil.ReverseProxy) Handler {
+func NewHandler(proxy *ReverseProxy, reqSigner RequestSigner) Handler {
 	return &handler{
-		proxy: proxy,
+		proxy:     proxy,
+		reqSigner: reqSigner,
 	}
 }
 
@@ -30,18 +28,21 @@ func (h *handler) Health(c *gin.Context) {
 }
 
 func (h *handler) ForwardRequest(c *gin.Context) {
-	h.proxy.ServeHTTP(c.Writer, c.Request)
-}
+	req := c.Request.Clone(c)
+	req.Host = h.proxy.TargetHost
+	req.Header.Set("host", h.proxy.TargetHost)
 
-func NewProxy(cfg config.ProxyConfig) (*httputil.ReverseProxy, error) {
-	upstreamURL, err := url.Parse(cfg.UpstreamTarget)
+	signedReq, err := h.reqSigner.SignRequest(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse upstream target: %w", err)
+		errJson := gin.H{"error": err.Error()}
+		switch err.(type) {
+		case *InvalidRequestError:
+			c.AbortWithStatusJSON(http.StatusBadRequest, errJson)
+		default:
+			c.AbortWithStatusJSON(http.StatusInternalServerError, errJson)
+		}
+		return
 	}
 
-	rp := httputil.NewSingleHostReverseProxy(upstreamURL)
-	// rp.Director = func(req *http.Request) {
-	//	// TODO: Request signer here
-	// }
-	return rp, nil
+	h.proxy.ServeHTTP(c.Writer, signedReq)
 }
