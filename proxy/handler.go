@@ -26,7 +26,7 @@ func NewHandler(proxy *httputil.ReverseProxy) Handler {
 }
 
 func (h *handler) Health(c *gin.Context) {
-
+	c.JSON(http.StatusOK, gin.H{"status": "up"})
 }
 
 func (h *handler) ForwardRequest(c *gin.Context) {
@@ -40,8 +40,8 @@ func NewProxy(cfg config.ProxyConfig) (*httputil.ReverseProxy, error) {
 	}
 
 	rp := httputil.NewSingleHostReverseProxy(upstreamURL)
-	rp.Director = func(req *http.Request) {
-		// TODO: Request signer here
-	}
+	//rp.Director = func(req *http.Request) {
+	//	// TODO: Request signer here
+	//}
 	return rp, nil
 }

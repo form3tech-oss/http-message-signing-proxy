@@ -120,7 +120,7 @@ func TestLoadConfig(t *testing.T) {
 		},
 		Server: ServerConfig{
 			Port: 9090,
-			TLS: TLSConfig{
+			SSL: SSLConfig{
 				Enable:       true,
 				CertFilePath: "/etc/ssl/certs/cert.crt",
 				KeyFilePath:  "/etc/ssl/private/private.key",

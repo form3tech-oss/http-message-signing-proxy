@@ -8,7 +8,7 @@ type Config struct {
 
 type ServerConfig struct {
 	Port int       `mapstructure:"port"`
-	TLS  TLSConfig `mapstructure:"tls"`
+	SSL  SSLConfig `mapstructure:"ssl"`
 }
 
 type ProxyConfig struct {
@@ -16,7 +16,7 @@ type ProxyConfig struct {
 	Signer         SignerConfig `mapstructure:"signer"`
 }
 
-type TLSConfig struct {
+type SSLConfig struct {
 	Enable       bool   `mapstructure:"enable"`
 	CertFilePath string `mapstructure:"certFilePath"`
 	KeyFilePath  string `mapstructure:"keyFilePath"`

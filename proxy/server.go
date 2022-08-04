@@ -18,7 +18,7 @@ import (
 
 type Server struct {
 	http.Server
-	tls config.TLSConfig
+	sslConfig config.SSLConfig
 }
 
 func NewServer(cfg config.ServerConfig, handler Handler) *Server {
@@ -29,16 +29,21 @@ func NewServer(cfg config.ServerConfig, handler Handler) *Server {
 		c.JSON(http.StatusNotFound, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
 	})
 
-	router.GET("/health", handler.Health)
-	router.GET("/prometheus", func(c *gin.Context) {
+	router.GET("/-/health", handler.Health)
+	router.GET("/-/prometheus", func(c *gin.Context) {
 		promhttp.Handler().ServeHTTP(c.Writer, c.Request)
 	})
+
+	// NoRoute means all other routes.
+	// We cannot use wildcard here because it will conflict with /-/health and /-/prometheus above.
+	router.NoRoute(handler.ForwardRequest)
 
 	return &Server{
 		Server: http.Server{
 			Addr:    fmt.Sprintf(":%d", cfg.Port),
 			Handler: router,
 		},
+		sslConfig: cfg.SSL,
 	}
 }
 
@@ -47,9 +52,11 @@ func (s *Server) Start() {
 	// it won't block the graceful shutdown handling below
 	go func() {
 		var err error
-		if s.tls.Enable {
-			err = s.ListenAndServeTLS(s.tls.CertFilePath, s.tls.KeyFilePath)
+		if s.sslConfig.Enable {
+			log.Info("starting server in TLS mode")
+			err = s.ListenAndServeTLS(s.sslConfig.CertFilePath, s.sslConfig.KeyFilePath)
 		} else {
+			log.Info("starting server without TLS")
 			err = s.ListenAndServe()
 		}
 		if err != nil && errors.Is(err, http.ErrServerClosed) {
