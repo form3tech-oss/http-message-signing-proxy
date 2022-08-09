@@ -1,7 +1,7 @@
 server:
   port: 8080
   ssl:
-    enable: true
+    enable: false
     certFilePath: "/etc/ssl/certs/cert.crt"
     keyFilePath: "/etc/ssl/private/private.key"
 

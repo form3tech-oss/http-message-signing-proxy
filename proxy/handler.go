@@ -6,7 +6,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 
-	"github.com/form3tech-oss/https-signing-proxy/config"
+	"github.com/form3tech-oss/http-message-signing-proxy/config"
 	"github.com/gin-gonic/gin"
 )
 
@@ -40,8 +40,8 @@ func NewProxy(cfg config.ProxyConfig) (*httputil.ReverseProxy, error) {
 	}
 
 	rp := httputil.NewSingleHostReverseProxy(upstreamURL)
-	//rp.Director = func(req *http.Request) {
+	// rp.Director = func(req *http.Request) {
 	//	// TODO: Request signer here
-	//}
+	// }
 	return rp, nil
 }

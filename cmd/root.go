@@ -3,9 +3,9 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/form3tech-oss/https-signing-proxy/config"
-	"github.com/form3tech-oss/https-signing-proxy/logger"
-	"github.com/form3tech-oss/https-signing-proxy/proxy"
+	"github.com/form3tech-oss/http-message-signing-proxy/config"
+	"github.com/form3tech-oss/http-message-signing-proxy/logger"
+	"github.com/form3tech-oss/http-message-signing-proxy/proxy"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )

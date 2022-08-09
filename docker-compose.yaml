@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  proxy:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config/config_test.yaml:/config.yaml:ro
+    command:
+      - --config
+      - ./config.yaml
+      - --set
+      - proxy.upstreamTarget=https://httpbin.org
+      - --set
+      - server.port=8080
+      - --set
+      - log.level=debug

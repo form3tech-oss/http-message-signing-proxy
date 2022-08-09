@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/form3tech-oss/https-signing-proxy/config"
+	"github.com/form3tech-oss/http-message-signing-proxy/config"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"

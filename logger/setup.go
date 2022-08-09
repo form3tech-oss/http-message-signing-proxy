@@ -3,7 +3,7 @@ package logger
 import (
 	"fmt"
 
-	"github.com/form3tech-oss/https-signing-proxy/config"
+	"github.com/form3tech-oss/http-message-signing-proxy/config"
 	log "github.com/sirupsen/logrus"
 )
 
