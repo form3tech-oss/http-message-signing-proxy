@@ -12,14 +12,20 @@ import (
 
 func TestHandler(t *testing.T) {
 	expectedRespBody := "OK"
+	mockURL := "mock"
 
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
 	mockReqSigner := NewMockRequestSigner(mockCtrl)
 	mockReqSigner.EXPECT().SignRequest(gomock.Any()).DoAndReturn(func(r *http.Request) (*http.Request, error) {
+		// We don't test the signer here so we return the request as-is
 		return r, nil
 	})
+
+	mockMetricPublisher := NewMockMetricPublisher(mockCtrl)
+	mockMetricPublisher.EXPECT().MeasureSigningDuration(http.MethodGet, mockURL, gomock.Any())
+	mockMetricPublisher.EXPECT().IncrementSignedRequestCount(http.MethodGet, mockURL)
 
 	targetSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -30,13 +36,13 @@ func TestHandler(t *testing.T) {
 	rs, err := NewReverseProxy(targetSrv.URL)
 	require.NoError(t, err)
 
-	h := NewHandler(rs, mockReqSigner)
+	h := NewHandler(rs, mockReqSigner, mockMetricPublisher)
 
 	w := CreateTestResponseRecorder()
 	_, e := gin.CreateTestContext(w)
 	e.NoRoute(h.ForwardRequest)
 
-	req, err := http.NewRequest(http.MethodGet, "mock", nil)
+	req, err := http.NewRequest(http.MethodGet, mockURL, nil)
 	require.NoError(t, err)
 
 	e.ServeHTTP(w, req)

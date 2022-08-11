@@ -5,6 +5,7 @@ import (
 
 	"github.com/form3tech-oss/http-message-signing-proxy/config"
 	"github.com/form3tech-oss/http-message-signing-proxy/logger"
+	"github.com/form3tech-oss/http-message-signing-proxy/metric"
 	"github.com/form3tech-oss/http-message-signing-proxy/proxy"
 	"github.com/form3tech-oss/http-message-signing-proxy/signer"
 	"github.com/sirupsen/logrus"
@@ -46,8 +47,10 @@ func NewRootCmd() *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to create signing proxy: %w", err)
 			}
-			handler := proxy.NewHandler(signingProxy, reqSigner)
-			server := proxy.NewServer(cfg.Server, handler)
+
+			metricPublisher := metric.NewMetricPublisher(cfg.Proxy.UpstreamTarget)
+			handler := proxy.NewHandler(signingProxy, reqSigner, metricPublisher)
+			server := proxy.NewServer(cfg.Server, handler, metricPublisher)
 			server.Start()
 
 			return nil

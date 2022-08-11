@@ -20,9 +20,8 @@ type Server struct {
 	sslConfig config.SSLConfig
 }
 
-func NewServer(cfg config.ServerConfig, handler Handler) *Server {
+func NewServer(cfg config.ServerConfig, handler Handler, metric MetricPublisher) *Server {
 	router := gin.New()
-	router.Use(gin.Recovery())
 
 	router.GET("/-/health", handler.Health)
 	router.GET("/-/prometheus", func(c *gin.Context) {
@@ -31,7 +30,11 @@ func NewServer(cfg config.ServerConfig, handler Handler) *Server {
 
 	// NoRoute means all other routes.
 	// We cannot use wildcard here because it will conflict with /-/health and /-/prometheus above.
-	router.NoRoute(handler.ForwardRequest)
+	router.NoRoute(
+		RecoverMiddleware(metric),
+		LogRequestMiddleware(metric),
+		handler.ForwardRequest,
+	)
 
 	return &Server{
 		Server: http.Server{

@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,14 +13,16 @@ type Handler interface {
 }
 
 type handler struct {
-	proxy     *ReverseProxy
-	reqSigner RequestSigner
+	proxy           *ReverseProxy
+	reqSigner       RequestSigner
+	metricPublisher MetricPublisher
 }
 
-func NewHandler(proxy *ReverseProxy, reqSigner RequestSigner) Handler {
+func NewHandler(proxy *ReverseProxy, reqSigner RequestSigner, metricPublisher MetricPublisher) Handler {
 	return &handler{
-		proxy:     proxy,
-		reqSigner: reqSigner,
+		proxy:           proxy,
+		reqSigner:       reqSigner,
+		metricPublisher: metricPublisher,
 	}
 }
 
@@ -32,17 +35,23 @@ func (h *handler) ForwardRequest(c *gin.Context) {
 	req.Host = h.proxy.TargetHost
 	req.Header.Set("host", h.proxy.TargetHost)
 
+	start := time.Now()
 	signedReq, err := h.reqSigner.SignRequest(req)
+	duration := time.Since(start)
+
 	if err != nil {
 		errJson := gin.H{"error": err.Error()}
 		switch err.(type) {
 		case *InvalidRequestError:
 			c.AbortWithStatusJSON(http.StatusBadRequest, errJson)
 		default:
+			h.metricPublisher.IncrementInternalErrorCount(c.Request.Method, c.Request.URL.Path)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, errJson)
 		}
 		return
 	}
 
+	h.metricPublisher.MeasureSigningDuration(c.Request.Method, c.Request.URL.Path, duration.Seconds())
+	h.metricPublisher.IncrementSignedRequestCount(c.Request.Method, c.Request.URL.Path)
 	h.proxy.ServeHTTP(c.Writer, signedReq)
 }
