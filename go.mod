@@ -2,10 +2,8 @@ module github.com/form3tech-oss/http-message-signing-proxy
 
 go 1.18
 
-replace github.com/form3tech-oss/go-http-message-signatures => /Users/vhphan/workspace/form3tech-oss/go-http-message-signatures
-
 require (
-	github.com/form3tech-oss/go-http-message-signatures v0.0.1
+	github.com/form3tech-oss/go-http-message-signatures v0.0.0-20220811113413-c74252c1471f
 	github.com/gin-gonic/gin v1.8.1
 	github.com/golang/mock v1.6.0
 	github.com/prometheus/client_golang v1.12.2
