@@ -1,9 +1,18 @@
 # HTTPS signing proxy
 
+- [Introduction](#introduction)
+- [Run the proxy](#run-the-proxy)
+- [Configuration](#configuration)
+  - [Configuration override](#configuration-override)
+    - [Using flags](#override-config-using---set-flag)
+    - [Using env var](#override-config-using-env-var)
+- [Proxy mechanism](#proxy-mechanism)
+- [Metrics](#metrics)
+
 ## Introduction
 
 The request signing proxy would sit in front of the client and intercept outbound requests, sign them with client's
-private key and transfer signed requests to the server.
+private key and transfer signed requests to the server. It uses the request signing library [here](https://github.com/form3tech-oss/go-http-message-signatures).
 
 ![design.png](doc/images/design.png)
 
@@ -96,7 +105,7 @@ export PROXY_SIGNER_KEYID=5099392e-3040-40f9-ac70-ce66a9ee0ed6
 export PROXY_SIGNER_BODYDIGESTALGO=SHA-512
 ```
 
-## Proxying
+## Proxy mechanism
 
 Any request coming in the proxy will be signed and forwarded to the upstream target, meaning the host will be replaced
 by the target host and a signature header will be added, the rest of the request is kept as-is. If the request fails 
@@ -112,8 +121,6 @@ Additionally, there are two endpoints explicitly exposed by the proxy:
 - `GET /-/prometheus` for metrics.
 
 Incoming requests like above will not be signed nor forwarded to the upstream target.
-
-
 
 ## Metrics
 
