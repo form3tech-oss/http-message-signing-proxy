@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The request signing proxy would sit in front of the client and intercept outbound requests, sign them with client's 
+The request signing proxy would sit in front of the client and intercept outbound requests, sign them with client's
 private key and transfer signed requests to the server.
 
 ![design.png](doc/images/design.png)
@@ -57,7 +57,7 @@ proxy:
       # However, at least one must be specified in the request. 
       # For example, a GET request does not have content-length header, 
       # so the proxy will not include content-length to the signature.
-      signatureHeaders: 
+      signatureHeaders:
         - host
         - date
         - content-length
@@ -77,7 +77,7 @@ One can override any `string` field (list field override is not supported) with 
 #### Override config using `--set` flag
 
 To override specific fields, `--set key=value` flag can be set multiple times.
-For example, `proxy.signer.keyId` and `log.level` in the yaml file above can be overridden by: 
+For example, `proxy.signer.keyId` and `log.level` in the yaml file above can be overridden by:
 
 ```shell
 ./signing-proxy --config <config_file_path> \
@@ -87,9 +87,9 @@ For example, `proxy.signer.keyId` and `log.level` in the yaml file above can be 
 
 #### Override config using env var
 
-A `a.b.c` field can be automatically overridden by setting a `A_B_C` env var 
+A `a.b.c` field can be automatically overridden by setting a `A_B_C` env var
 (all capitalised and dots replaced by underscore).
-For example, `proxy.signer.keyId` and `proxy.signer.bodyDigestAlgo` in the yaml file above can be overridden by: 
+For example, `proxy.signer.keyId` and `proxy.signer.bodyDigestAlgo` in the yaml file above can be overridden by:
 
 ```shell
 export PROXY_SIGNER_KEYID=5099392e-3040-40f9-ac70-ce66a9ee0ed6
@@ -98,8 +98,13 @@ export PROXY_SIGNER_BODYDIGESTALGO=SHA-512
 
 ## Proxying
 
-Any request coming in the proxy will be signed and forwarded to the upstream target, meaning the host will be replaced 
-by the target host and a signature header will be added, the rest of the request is kept as-is.
+Any request coming in the proxy will be signed and forwarded to the upstream target, meaning the host will be replaced
+by the target host and a signature header will be added, the rest of the request is kept as-is. If the request fails 
+the signing validation (due to missing headers for example), the request will not be proxied and the server will return 
+a `400 - Bad Request` response to the client.
+
+The upstream target can be another proxy. In that case, `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY` environment variables 
+can be explicitly set.
 
 Additionally, there are two endpoints explicitly exposed by the proxy:
 
@@ -107,3 +112,17 @@ Additionally, there are two endpoints explicitly exposed by the proxy:
 - `GET /-/prometheus` for metrics.
 
 Incoming requests like above will not be signed nor forwarded to the upstream target.
+
+
+
+## Metrics
+
+The proxy publishes certain metrics under `GET /-/prometheus` endpoint:
+
+|        Metric name         |   Type    | Description                                                                        |
+|:--------------------------:|:---------:|------------------------------------------------------------------------------------|
+| total_internal_error_count |  Counter  | Total number of the proxy's internal errors. Upstream errors do not count.         |
+|    total_request_count     |  Counter  | Total number of requests coming to the proxy.                                      |
+| total_signed_request_count |  Counter  | Total number of incoming requests that have been signed and proxied.               |
+|  signing_duration_seconds  | Histogram | Request signing duration time in seconds.                                          |
+|  request_duration_seconds  | Histogram | Total request duration time in seconds, including signing and upstream processing. |
