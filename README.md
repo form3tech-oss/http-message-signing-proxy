@@ -58,7 +58,7 @@ proxy:
     signatureHashAlgo: "SHA-256"
     # Signature headers config
     headers:
-      # For PUT and POST request, whether a digest header should be included.
+      # For POST, PUT and PATCH request, whether a digest header should be included.
       includeDigest: true
       # Whether a special (request-target) header should be included.
       includeRequestTarget: true
