@@ -148,7 +148,7 @@ func TestGetSignatureHeaders(t *testing.T) {
 				IncludeRequestTarget: true,
 				SignatureHeaders:     []string{"host"},
 			},
-			[]string{"host", digestHeaderKey, requestTargetHeaderKey},
+			[]string{"host", requestTargetHeaderKey},
 			require.NoError,
 			http.MethodPut,
 			nil,

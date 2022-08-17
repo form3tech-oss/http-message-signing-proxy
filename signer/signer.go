@@ -127,7 +127,7 @@ func loadKey(keyFile string) (*rsa.PrivateKey, error) {
 func shouldHaveBody(req *http.Request) bool {
 	switch req.Method {
 	case http.MethodPut, http.MethodPost, http.MethodPatch:
-		return req.Body != http.NoBody
+		return req.Body != nil && req.Body != http.NoBody
 	default:
 		return false
 	}
