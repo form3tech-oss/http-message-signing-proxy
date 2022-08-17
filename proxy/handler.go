@@ -33,7 +33,7 @@ func (h *handler) Health(c *gin.Context) {
 func (h *handler) ForwardRequest(c *gin.Context) {
 	req := c.Request.Clone(c)
 	req.Host = h.proxy.TargetHost
-	req.Header.Set("host", h.proxy.TargetHost)
+	req.Header.Set("Host", h.proxy.TargetHost)
 
 	start := time.Now()
 	signedReq, err := h.reqSigner.SignRequest(req)

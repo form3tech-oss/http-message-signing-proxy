@@ -6,21 +6,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
-// CounterVector configuration for creating a Prometheus counter vector.
-type CounterVector struct {
-	Name   string
-	Help   string
-	Labels []string
-}
-
-// HistogramVector configuration for creating a Prometheus histogram vector.
-type HistogramVector struct {
-	Name    string
-	Help    string
-	Labels  []string
-	Buckets []float64
-}
-
 const (
 	promNamespace       = "signing_proxy"
 	labelUpstreamTarget = "upstream_target"
