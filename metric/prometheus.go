@@ -22,7 +22,7 @@ var (
 	errorCounterVec = promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Namespace: promNamespace,
-			Name:      "total_internal_error_count",
+			Name:      "internal_error_total",
 			Help:      "Total number of internal errors",
 		},
 		commonLabels,
@@ -30,7 +30,7 @@ var (
 	totalReqCounterVec = promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Namespace: promNamespace,
-			Name:      "total_request_count",
+			Name:      "request_count_total",
 			Help:      "Total number of incoming requests",
 		},
 		commonLabels,
@@ -38,7 +38,7 @@ var (
 	totalSignedReqCounterVec = promauto.NewCounterVec(
 		prometheus.CounterOpts{
 			Namespace: promNamespace,
-			Name:      "total_signed_request_count",
+			Name:      "signed_request_total",
 			Help:      "Total number of incoming requests that are signed",
 		},
 		commonLabels,
