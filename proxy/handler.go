@@ -37,7 +37,7 @@ func (h *handler) ForwardRequest(c *gin.Context) {
 
 	start := time.Now()
 	signedReq, err := h.reqSigner.SignRequest(req)
-	duration := time.Since(start)
+	singingDuration := time.Since(start)
 
 	if err != nil {
 		errJson := gin.H{"error": err.Error()}
@@ -51,7 +51,7 @@ func (h *handler) ForwardRequest(c *gin.Context) {
 		return
 	}
 
-	h.metricPublisher.MeasureSigningDuration(c.Request.Method, c.Request.URL.Path, duration.Seconds())
+	h.metricPublisher.MeasureSigningDuration(c.Request.Method, c.Request.URL.Path, singingDuration.Seconds())
 	h.metricPublisher.IncrementSignedRequestCount(c.Request.Method, c.Request.URL.Path)
 	h.proxy.ServeHTTP(c.Writer, signedReq)
 }
