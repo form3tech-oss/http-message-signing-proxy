@@ -1,0 +1,25 @@
+server:
+  port: 8080
+  ssl:
+    enable: true
+    certFilePath: "/etc/ssl/certs/cert.crt"
+    keyFilePath: "/etc/ssl/private/private.key"
+
+proxy:
+  upstreamTarget: "https://httpbin.org"
+  signer:
+    keyId: "6f33b219-137c-467e-9a61-f61040a03363"
+    keyFilePath: "/etc/app/private/rsa_private_key.pem"
+    bodyDigestAlgo: "SHA-256"
+    signatureHashAlgo: "SHA-256"
+    headers:
+      includeDigest: true
+      includeRequestTarget: true
+      signatureHeaders:
+        - host
+        - date
+        - content-length
+
+log:
+  level: info
+  format: json

@@ -67,7 +67,7 @@ func (rs *requestSigner) SignRequest(req *http.Request) (*http.Request, error) {
 
 	signedReq, err := rs.MessageSigner.SignRequest(req, headers)
 	switch err.(type) {
-	case *msgsigner.DataError:
+	case *msgsigner.DataError, *msgsigner.SigningError:
 		return nil, proxy.NewInvalidRequestError(err)
 	default:
 		return signedReq, err
@@ -127,7 +127,7 @@ func loadKey(keyFile string) (*rsa.PrivateKey, error) {
 func shouldHaveBody(req *http.Request) bool {
 	switch req.Method {
 	case http.MethodPut, http.MethodPost, http.MethodPatch:
-		return req.Body != nil && req.Body != http.NoBody
+		return req.Body != nil && req.Body != http.NoBody && req.ContentLength > 0
 	default:
 		return false
 	}

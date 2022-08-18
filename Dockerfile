@@ -13,7 +13,7 @@ RUN go build -o /go/bin/proxy
 
 FROM alpine:3.16
 
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates && update-ca-certificates
 
 COPY --from=build-env /go/bin/proxy /
 
