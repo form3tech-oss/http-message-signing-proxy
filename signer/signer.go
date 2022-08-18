@@ -48,7 +48,7 @@ func NewRequestSigner(cfg config.SignerConfig) (proxy.RequestSigner, error) {
 		return nil, err
 	}
 
-	msgSigner, err := msgsigner.NewMessageSigner(digestHashAlgo, signer, cfg.KeyId, msgsigner.Signature)
+	msgSigner, err := msgsigner.NewMessageSigner(digestHashAlgo, signer, cfg.KeyId, msgsigner.Authorization)
 	if err != nil {
 		return nil, err
 	}

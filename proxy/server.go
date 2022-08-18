@@ -32,7 +32,7 @@ func NewServer(cfg config.ServerConfig, handler Handler, metric MetricPublisher)
 	// We cannot use wildcard here because it will conflict with /-/health and /-/prometheus above.
 	router.NoRoute(
 		RecoverMiddleware(metric),
-		LogRequestMiddleware(metric),
+		LogAndMetricsMiddleware(metric),
 		handler.ForwardRequest,
 	)
 

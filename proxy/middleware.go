@@ -23,8 +23,7 @@ func RecoverMiddleware(metricPublisher MetricPublisher) gin.HandlerFunc {
 				}).Errorf("uncaught panic")
 				metricPublisher.IncrementInternalErrorCount(c.Request.Method, c.Request.URL.Path)
 
-				// Check for a broken connection, as it is not really a
-				// condition that warrants a panic stack trace.
+				// Check for a broken connection
 				var brokenPipe bool
 				if ne, ok := err.(*net.OpError); ok {
 					var se *os.SyscallError
@@ -47,7 +46,7 @@ func RecoverMiddleware(metricPublisher MetricPublisher) gin.HandlerFunc {
 	}
 }
 
-func LogRequestMiddleware(metricPublisher MetricPublisher) gin.HandlerFunc {
+func LogAndMetricsMiddleware(metricPublisher MetricPublisher) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()
 
