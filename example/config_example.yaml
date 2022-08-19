@@ -18,7 +18,9 @@ proxy:
       signatureHeaders:
         - host
         - date
+        - accept
         - content-length
+        - content-type
 
 log:
   level: info

@@ -17,4 +17,6 @@ RUN apk add --no-cache ca-certificates && update-ca-certificates
 
 COPY --from=build-env /go/bin/proxy /
 
+ENV GIN_MODE=release
+
 ENTRYPOINT ["./proxy"]
