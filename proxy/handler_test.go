@@ -32,7 +32,11 @@ func TestHandler(t *testing.T) {
 	h := NewHandler(rs, mockReqSigner, mockMetricPublisher)
 	w := test.NewTestResponseRecorder()
 	_, e := gin.CreateTestContext(w)
-	e.NoRoute(h.ForwardRequest)
+	e.NoRoute(
+		RecoverMiddleware(mockMetricPublisher),
+		LogAndMetricsMiddleware(mockMetricPublisher),
+		h.ForwardRequest,
+	)
 
 	req, err := http.NewRequest(http.MethodGet, mockURL, nil)
 	require.NoError(t, err)
@@ -54,8 +58,10 @@ func mockReqSigner(mockCtrl *gomock.Controller) *MockRequestSigner {
 
 func mockMetricPublisher(mockCtrl *gomock.Controller, mockURL string) *MockMetricPublisher {
 	mockMetricPublisher := NewMockMetricPublisher(mockCtrl)
+	mockMetricPublisher.EXPECT().IncrementTotalRequestCount(http.MethodGet, mockURL)
 	mockMetricPublisher.EXPECT().MeasureSigningDuration(http.MethodGet, mockURL, gomock.Any())
 	mockMetricPublisher.EXPECT().IncrementSignedRequestCount(http.MethodGet, mockURL)
+	mockMetricPublisher.EXPECT().MeasureTotalDuration(http.MethodGet, mockURL, gomock.Any())
 	return mockMetricPublisher
 }
 
