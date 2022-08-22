@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/form3tech-oss/http-message-signing-proxy/test"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
@@ -38,7 +39,7 @@ func TestHandler(t *testing.T) {
 
 	h := NewHandler(rs, mockReqSigner, mockMetricPublisher)
 
-	w := CreateTestResponseRecorder()
+	w := test.NewTestResponseRecorder()
 	_, e := gin.CreateTestContext(w)
 	e.NoRoute(h.ForwardRequest)
 
@@ -49,20 +50,4 @@ func TestHandler(t *testing.T) {
 
 	require.Equal(t, expectedRespBody, w.Body.String())
 	require.Equal(t, http.StatusOK, w.Code)
-}
-
-type TestResponseRecorder struct {
-	*httptest.ResponseRecorder
-	closeChannel chan bool
-}
-
-func (r *TestResponseRecorder) CloseNotify() <-chan bool {
-	return r.closeChannel
-}
-
-func CreateTestResponseRecorder() *TestResponseRecorder {
-	return &TestResponseRecorder{
-		httptest.NewRecorder(),
-		make(chan bool, 1),
-	}
 }

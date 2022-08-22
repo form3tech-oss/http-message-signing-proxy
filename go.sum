@@ -73,6 +73,8 @@ github.com/form3tech-oss/go-http-message-signatures v0.0.0-20220811113413-c74252
 github.com/form3tech-oss/go-http-message-signatures v0.0.0-20220811113413-c74252c1471f/go.mod h1:6qq2ZYxJOdKa21kGRiXzwBHSFrEIBFCy6rYGTXB7pEw=
 github.com/form3tech-oss/go-http-message-signatures v0.0.0-20220815160010-cb5ecb44c508 h1:XdleqEjdYLKnsuRQFAnxta511vWAwBajfR7xvb0zFs8=
 github.com/form3tech-oss/go-http-message-signatures v0.0.0-20220815160010-cb5ecb44c508/go.mod h1:6qq2ZYxJOdKa21kGRiXzwBHSFrEIBFCy6rYGTXB7pEw=
+github.com/form3tech-oss/go-http-message-signatures v0.0.0-20220819143736-66d401e49355 h1:KgrjgrCRgBkSpEai3Sim+zZxfZKTZ6qt444r2HXCD1c=
+github.com/form3tech-oss/go-http-message-signatures v0.0.0-20220819143736-66d401e49355/go.mod h1:6qq2ZYxJOdKa21kGRiXzwBHSFrEIBFCy6rYGTXB7pEw=
 github.com/frankban/quicktest v1.14.3 h1:FJKSZTDHjyhriyC81FLQ0LY93eSai0ZyR/ZIkd3ZUKE=
 github.com/fsnotify/fsnotify v1.5.4 h1:jRbGcIw6P2Meqdwuo0H1p6JVLbL5DHKAKlYndzMwVZI=
 github.com/fsnotify/fsnotify v1.5.4/go.mod h1:OVB6XrOHzAwXMpEM7uPOzcehqUV2UqJxmVXmkdnm1bU=
