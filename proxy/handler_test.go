@@ -14,31 +14,22 @@ import (
 func TestHandler(t *testing.T) {
 	expectedRespBody := "OK"
 	mockURL := "mock"
-
 	mockCtrl := gomock.NewController(t)
 	defer mockCtrl.Finish()
 
-	mockReqSigner := NewMockRequestSigner(mockCtrl)
-	mockReqSigner.EXPECT().SignRequest(gomock.Any()).DoAndReturn(func(r *http.Request) (*http.Request, error) {
-		// We don't test the signer here so we return the request as-is
-		return r, nil
-	})
+	// Mock dependencies
+	mockReqSigner := mockReqSigner(mockCtrl)
+	mockMetricPublisher := mockMetricPublisher(mockCtrl, mockURL)
 
-	mockMetricPublisher := NewMockMetricPublisher(mockCtrl)
-	mockMetricPublisher.EXPECT().MeasureSigningDuration(http.MethodGet, mockURL, gomock.Any())
-	mockMetricPublisher.EXPECT().IncrementSignedRequestCount(http.MethodGet, mockURL)
+	// Test upstream target that returns 200 OK
+	targetSrv := testTargetServer(expectedRespBody)
 
-	targetSrv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		_, err := w.Write([]byte(expectedRespBody))
-		require.NoError(t, err)
-	}))
-
+	// Reverse proxy pointing to test target
 	rs, err := NewReverseProxy(targetSrv.URL)
 	require.NoError(t, err)
 
+	// Test handler
 	h := NewHandler(rs, mockReqSigner, mockMetricPublisher)
-
 	w := test.NewTestResponseRecorder()
 	_, e := gin.CreateTestContext(w)
 	e.NoRoute(h.ForwardRequest)
@@ -50,4 +41,27 @@ func TestHandler(t *testing.T) {
 
 	require.Equal(t, expectedRespBody, w.Body.String())
 	require.Equal(t, http.StatusOK, w.Code)
+}
+
+func mockReqSigner(mockCtrl *gomock.Controller) *MockRequestSigner {
+	mockReqSigner := NewMockRequestSigner(mockCtrl)
+	mockReqSigner.EXPECT().SignRequest(gomock.Any()).DoAndReturn(func(r *http.Request) (*http.Request, error) {
+		// We don't test the signer here so we return the request as-is
+		return r, nil
+	})
+	return mockReqSigner
+}
+
+func mockMetricPublisher(mockCtrl *gomock.Controller, mockURL string) *MockMetricPublisher {
+	mockMetricPublisher := NewMockMetricPublisher(mockCtrl)
+	mockMetricPublisher.EXPECT().MeasureSigningDuration(http.MethodGet, mockURL, gomock.Any())
+	mockMetricPublisher.EXPECT().IncrementSignedRequestCount(http.MethodGet, mockURL)
+	return mockMetricPublisher
+}
+
+func testTargetServer(expectedBody string) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write([]byte(expectedBody))
+	}))
 }
