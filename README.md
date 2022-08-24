@@ -39,56 +39,8 @@ In [example directory](./example), there are several files which help running th
 
 ## Configuration
 
-```yaml
-# HTTP server config
-server:
-  # Listening port
-  port: 8080
-  # If SSL is used, the proxy will receive https request from downstream, terminate it, sign it then establish a new
-  # https connection to upstream
-  ssl:
-    enable: true
-    # Location of the proxy's certificate, if SSL is enabled  
-    certFilePath: "/etc/ssl/certs/cert.crt"
-    # Location of the proxy's private key, if SSL is enabled
-    keyFilePath: "/etc/ssl/private/private.key"
-
-# Request forward proxy config
-proxy:
-  # URL where the proxy should forward the request to. It can be a server or another proxy.
-  upstreamTarget: "https://api.form3.tech/v1"
-  # Request signing config
-  signer:
-    # The key id stored on remote server that maps to the public key
-    keyId: "27781930-f2d0-463e-b6cf-0ed0ec0d8dd9"
-    # Location of the private key which will be used to sign requests
-    keyFilePath: "/etc/form3/private/private.key"
-    # The algorithm used to create a digest for body content, can be either SHA-256 or SHA-512
-    bodyDigestAlgo: "SHA-256"
-    # The algorithm used to hash the signature, can be either SHA-256 or SHA-512
-    signatureHashAlgo: "SHA-256"
-    # Signature headers config
-    headers:
-      # For POST, PUT and PATCH request, whether a digest header should be included.
-      includeDigest: true
-      # Whether a special (request-target) header should be included.
-      includeRequestTarget: true
-      # List of headers to create signature from, only those which present in the request will be added. 
-      # However, at least one must be specified in the request. 
-      # For example, a GET request does not have content-length header, 
-      # so the proxy will not include content-length to the signature.
-      signatureHeaders:
-        - host
-        - date
-        - content-length
-
-# Log config
-log:
-  # Log level
-  level: info
-  # Log format, can be either 'text' or 'json'
-  format: json
-```
+Configuration is typically done with a yaml file. Refer to [config_example.yaml](./example/config_example.yaml) for all 
+configurable options.
 
 ### Configuration override
 
@@ -137,10 +89,10 @@ Incoming requests like above will not be signed nor forwarded to the upstream ta
 
 The proxy publishes certain metrics under `GET /-/prometheus` endpoint:
 
-|        Metric name         |   Type    | Description                                                                        |
-|:--------------------------:|:---------:|------------------------------------------------------------------------------------|
-| total_internal_error_count |  Counter  | Total number of the proxy's internal errors. Upstream errors do not count.         |
-|    total_request_count     |  Counter  | Total number of requests coming to the proxy.                                      |
-| total_signed_request_count |  Counter  | Total number of incoming requests that have been signed and proxied.               |
-|  signing_duration_seconds  | Histogram | Request signing duration time in seconds.                                          |
-|  request_duration_seconds  | Histogram | Total request duration time in seconds, including signing and upstream processing. |
+|       Metric name        |   Type    | Description                                                                        |
+|:------------------------:|:---------:|------------------------------------------------------------------------------------|
+|   internal_error_total   |  Counter  | Total number of the proxy's internal errors. Upstream errors do not count.         |
+|   request_count_total    |  Counter  | Total number of requests coming to the proxy.                                      |
+|   signed_request_total   |  Counter  | Total number of incoming requests that have been signed and proxied.               |
+| signing_duration_seconds | Histogram | Request signing duration time in seconds.                                          |
+| request_duration_seconds | Histogram | Total request duration time in seconds, including signing and upstream processing. |
