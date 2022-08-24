@@ -26,6 +26,17 @@ The proxy requires `--config` flag, which point to the config file. See [configu
 ./signing-proxy --config <config_file_path>
 ```
 
+In [example directory](./example), there are several files which help running the proxy locally:
+
+- [config_example.yaml](./example/config_example.yaml): A complete config file that should be in `--config` flag.
+- [cert.crt](./example/cert.crt): A self-signed certificate for an HTTPS proxy (TLS mode only).
+- [private.key](./example/private.key): The private key associated with the certificate above (TLS mode only).
+- [rsa_private_key.pem](./example/rsa_private_key.pem): A private key that is used to sign incoming request.
+- [rsa_public_key.pub](./example/rsa_public_key.pub): The public key associated with the private key above. It is not 
+  used by the proxy but will be useful if you need to verify the signature.
+- [docker-compose.yaml](./example/docker-compose.yaml): A convenient docker compose file that runs the proxy with all 
+  the config above. The proxy serves HTTPS requests at port 8080.
+
 ## Configuration
 
 ```yaml
@@ -48,7 +59,7 @@ proxy:
   upstreamTarget: "https://api.form3.tech/v1"
   # Request signing config
   signer:
-    # The key id stored on remote server that mapped to the public key
+    # The key id stored on remote server that maps to the public key
     keyId: "27781930-f2d0-463e-b6cf-0ed0ec0d8dd9"
     # Location of the private key which will be used to sign requests
     keyFilePath: "/etc/form3/private/private.key"
