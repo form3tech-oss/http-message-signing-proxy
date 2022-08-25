@@ -61,8 +61,8 @@ var (
 			Namespace: promNamespace,
 			Name:      "request_duration_seconds",
 			Help:      "Total request duration time in seconds, including signing and upstream processing",
-			// 20 buckets range from 50ms to 1s, since upstream duration is unknown
-			Buckets: prometheus.LinearBuckets(0.05, 0.05, 20),
+			// 20 buckets range from 50ms to 30s, since upstream duration is unknown
+			Buckets: prometheus.ExponentialBucketsRange(0.05, 30, 20),
 		},
 		commonLabels,
 	)
