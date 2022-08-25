@@ -36,7 +36,7 @@ type successResp struct {
 func writeBody(w http.ResponseWriter, content any) error {
 	b, err := json.Marshal(content)
 	if err != nil {
-		return nil
+		return err
 	}
 	_, err = w.Write(b)
 	return err

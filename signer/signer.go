@@ -38,7 +38,7 @@ func NewRequestSigner(cfg config.SignerConfig) (proxy.RequestSigner, error) {
 		return nil, err
 	}
 
-	digestHashAlgo, err := getHashAlgo(cfg.SignatureHashAlgo)
+	digestHashAlgo, err := getHashAlgo(cfg.BodyDigestAlgo)
 	if err != nil {
 		return nil, err
 	}
