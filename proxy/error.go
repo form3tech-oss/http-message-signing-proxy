@@ -2,6 +2,7 @@ package proxy
 
 import "fmt"
 
+// InvalidRequestError is raised when the contents of the request cause signing to fail.
 type InvalidRequestError struct {
 	reason error
 }

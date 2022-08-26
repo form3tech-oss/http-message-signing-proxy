@@ -105,7 +105,7 @@ func TestLoadConfig(t *testing.T) {
 
 	expectedCfg := Config{
 		Proxy: ProxyConfig{
-			UpstreamTarget: "https://princesscarolyn.net",
+			UpstreamTarget: "http://localhost",
 			Signer: SignerConfig{
 				KeyId:             "6f33b219-137c-467e-9a61-f61040a03363",
 				KeyFilePath:       "/etc/form3/private/private.key",
@@ -138,7 +138,7 @@ func TestLoadConfig(t *testing.T) {
 
 	configFile := "config_test.yaml"
 	overrides := []string{
-		"proxy.upstreamTarget=https://princesscarolyn.net",
+		"proxy.upstreamTarget=http://localhost",
 		"log.level=debug",
 	}
 	_ = os.Setenv("SERVER_PORT", "9090")

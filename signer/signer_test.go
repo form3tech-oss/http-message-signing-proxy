@@ -68,7 +68,7 @@ func TestLoadKey(t *testing.T) {
 }
 
 func TestGetSignatureHeaders(t *testing.T) {
-	dummyUrl := "https://oompaloompa.localhost:1234"
+	dummyUrl := "https://localhost:1234"
 	dummyBody := "{\"name\":\"travis\"}"
 
 	tests := []struct {
