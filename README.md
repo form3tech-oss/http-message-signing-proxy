@@ -1,13 +1,16 @@
 # HTTPS signing proxy
 
-- [Introduction](#introduction)
-- [Run the proxy](#run-the-proxy)
-- [Configuration](#configuration)
-  - [Configuration override](#configuration-override)
-    - [Using flags](#override-config-using---set-flag)
-    - [Using env var](#override-config-using-env-var)
-- [Proxy mechanism](#proxy-mechanism)
-- [Metrics](#metrics)
+- [HTTPS signing proxy](#https-signing-proxy)
+  - [Introduction](#introduction)
+  - [Run the proxy](#run-the-proxy)
+  - [Configuration](#configuration)
+    - [Configuration override](#configuration-override)
+      - [Override config using `--set` flag](#override-config-using---set-flag)
+      - [Override config using env var](#override-config-using-env-var)
+  - [Proxy mechanism](#proxy-mechanism)
+  - [Metrics](#metrics)
+  - [Testing and Linting](#testing-and-linting)
+  - [Contributions](#contributions)
 
 ## Introduction
 
@@ -24,6 +27,13 @@ The proxy requires `--config` flag, which point to the config file. See [configu
 
 ```shell
 ./signing-proxy --config <config_file_path>
+```
+
+The proxy can alternatively be run in a Docker image. An example is provided in [Dockerfile](./Dockerfile).
+
+```shell
+docker build -t signing-proxy .
+docker run -p <host_port>:<server_config_port> -v <config_file_path>:/config.yaml --config /config.yaml
 ```
 
 In [example directory](./example), there are several files which help running the proxy locally:
@@ -96,3 +106,23 @@ The proxy publishes certain metrics under `GET /-/prometheus` endpoint:
 |   signed_request_total   |  Counter  | Total number of incoming requests that have been signed and proxied.               |
 | signing_duration_seconds | Histogram | Request signing duration time in seconds.                                          |
 | request_duration_seconds | Histogram | Total request duration time in seconds, including signing and upstream processing. |
+
+## Testing and Linting
+
+To ensure the code has high quality, readability and maintainability, we use `golangci-lint` for linting and execute both 
+happy and sad test paths in our tests.
+
+The default `make` command will run both linting and tests
+
+Linting can be run individually using:
+```shell
+make lint
+```
+
+Tests can be run individually using:
+```shell
+make test
+```
+
+## Contributions
+If you'd like to help improve `http-message-signing-proxy`, please fork this repo and raise a PR!
