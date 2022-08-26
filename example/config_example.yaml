@@ -1,0 +1,51 @@
+# HTTP server config
+server:
+  # Listening port
+  port: 8080
+  # If SSL is used, the proxy will receive https request from downstream, terminate it, sign it then establish a new
+  # https connection to upstream
+  ssl:
+    # Enable/Disable SSL mode
+    enable: true
+    # Location of the proxy's certificate, if SSL is enabled
+    certFilePath: "/etc/ssl/certs/cert.crt"
+    # Location of the proxy's private key, if SSL is enabled
+    keyFilePath: "/etc/ssl/private/private.key"
+
+# Request forward proxy config
+proxy:
+  # URL where the proxy should forward the request to. It can be a server or another proxy.
+  upstreamTarget: "https://httpbin.org"
+  # Request signing config
+  signer:
+    # The key id stored on remote server that maps to the public key
+    keyId: "6f33b219-137c-467e-9a61-f61040a03363"
+    # Location of the private key which will be used to sign requests
+    keyFilePath: "/etc/app/private/rsa_private_key.pem"
+    # The algorithm used to create a digest for body content, can be either SHA-256 or SHA-512
+    bodyDigestAlgo: "SHA-256"
+    # The algorithm used to hash the signature, can be either SHA-256 or SHA-512
+    signatureHashAlgo: "SHA-256"
+    # Signature headers config
+    headers:
+      # For POST, PUT and PATCH request, whether a digest header should be included.
+      includeDigest: true
+      # Whether a special (request-target) header should be included.
+      includeRequestTarget: true
+      # List of headers to create signature from, only those which present in the request will be added.
+      # However, at least one must be specified in the request.
+      # For example, a GET request does not have content-length header,
+      # so the proxy will not include content-length to the signature.
+      signatureHeaders:
+        - host
+        - date
+        - accept
+        - content-length
+        - content-type
+
+# Log config
+log:
+  # Log level
+  level: info
+  # Log format, can be either 'text' or 'json'
+  format: json
