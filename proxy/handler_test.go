@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/form3tech-oss/http-message-signing-proxy/test"
 	"github.com/gin-gonic/gin"
@@ -12,6 +13,30 @@ import (
 )
 
 func TestHandler(t *testing.T) {
+	tests := []struct {
+		name         string
+		inputHeaders map[string]string
+		headerTestFn func(responseHeader http.Header)
+	}{
+		{
+			"automatic date header injection",
+			nil,
+			func(h http.Header) {
+				_, err := time.Parse(http.TimeFormat, h.Get("Date"))
+				require.NoError(t, err)
+			},
+		},
+		{
+			"date header present",
+			map[string]string{
+				"Date": time.Date(1998, time.May, 1, 1, 2, 3, 4, time.UTC).Format(http.TimeFormat),
+			},
+			func(h http.Header) {
+				require.Equal(t, "Fri, 01 May 1998 01:02:03 GMT", h.Get("Date"))
+			},
+		},
+	}
+
 	expectedRespBody := "OK"
 	mockURL := "mock"
 	mockCtrl := gomock.NewController(t)
@@ -29,8 +54,8 @@ func TestHandler(t *testing.T) {
 	require.NoError(t, err)
 
 	// Test handler
+	var w *test.TestResponseRecorder
 	h := NewHandler(rs, mockReqSigner, mockMetricPublisher)
-	w := test.NewTestResponseRecorder()
 	_, e := gin.CreateTestContext(w)
 	e.NoRoute(
 		RecoverMiddleware(mockMetricPublisher),
@@ -38,35 +63,49 @@ func TestHandler(t *testing.T) {
 		h.ForwardRequest,
 	)
 
-	req, err := http.NewRequest(http.MethodGet, mockURL, nil)
-	require.NoError(t, err)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w = test.NewTestResponseRecorder()
 
-	e.ServeHTTP(w, req)
+			// Test request
+			req, err := http.NewRequest(http.MethodGet, mockURL, nil)
+			require.NoError(t, err)
 
-	require.Equal(t, expectedRespBody, w.Body.String())
-	require.Equal(t, http.StatusOK, w.Code)
+			for k, v := range tt.inputHeaders {
+				req.Header.Set(k, v)
+			}
+
+			e.ServeHTTP(w, req)
+
+			require.Equal(t, expectedRespBody, w.Body.String())
+			require.Equal(t, http.StatusOK, w.Code)
+			tt.headerTestFn(w.Header())
+		})
+	}
 }
 
 func mockReqSigner(mockCtrl *gomock.Controller) *MockRequestSigner {
 	mockReqSigner := NewMockRequestSigner(mockCtrl)
 	mockReqSigner.EXPECT().SignRequest(gomock.Any()).DoAndReturn(func(r *http.Request) (*http.Request, error) {
-		// We don't test the signer here so we return the request as-is
+		// We don't test the signer here, so we return the request as-is
 		return r, nil
-	})
+	}).AnyTimes()
 	return mockReqSigner
 }
 
 func mockMetricPublisher(mockCtrl *gomock.Controller, mockURL string) *MockMetricPublisher {
 	mockMetricPublisher := NewMockMetricPublisher(mockCtrl)
-	mockMetricPublisher.EXPECT().IncrementTotalRequestCount(http.MethodGet, mockURL)
-	mockMetricPublisher.EXPECT().MeasureSigningDuration(http.MethodGet, mockURL, gomock.Any())
-	mockMetricPublisher.EXPECT().IncrementSignedRequestCount(http.MethodGet, mockURL)
-	mockMetricPublisher.EXPECT().MeasureTotalDuration(http.MethodGet, mockURL, gomock.Any())
+	mockMetricPublisher.EXPECT().IncrementTotalRequestCount(http.MethodGet, mockURL).AnyTimes()
+	mockMetricPublisher.EXPECT().MeasureSigningDuration(http.MethodGet, mockURL, gomock.Any()).AnyTimes()
+	mockMetricPublisher.EXPECT().IncrementSignedRequestCount(http.MethodGet, mockURL).AnyTimes()
+	mockMetricPublisher.EXPECT().MeasureTotalDuration(http.MethodGet, mockURL, gomock.Any()).AnyTimes()
 	return mockMetricPublisher
 }
 
 func testTargetServer(expectedBody string) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Date", r.Header.Get("Date"))
+		w.Header().Set("haha", "haha")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(expectedBody))
 	}))
