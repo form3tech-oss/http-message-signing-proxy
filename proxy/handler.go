@@ -35,6 +35,12 @@ func (h *handler) ForwardRequest(c *gin.Context) {
 	req.Host = h.proxy.TargetHost
 	req.Header.Set("Host", h.proxy.TargetHost)
 
+	// Add Date header since some clients don't automatically add it
+	date := req.Header.Get("Date")
+	if date == "" {
+		req.Header.Set("Date", time.Now().Format(http.TimeFormat))
+	}
+
 	start := time.Now()
 	signedReq, err := h.reqSigner.SignRequest(req)
 	singingDuration := time.Since(start)
