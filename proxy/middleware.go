@@ -13,6 +13,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const (
+	AccessControlAllowOriginHeader string = "Access-Control-Allow-Origin"
+)
+
 func RecoverMiddleware(metricPublisher MetricPublisher) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
@@ -70,4 +74,13 @@ func LogAndMetricsMiddleware(metricPublisher MetricPublisher) gin.HandlerFunc {
 			"client_ip":   c.ClientIP(),
 		}).Info("request summary")
 	}
+}
+
+func CORSMiddleware(accessControlAllowOrigin string) gin.HandlerFunc {
+	if accessControlAllowOrigin != "" {
+		return func(c *gin.Context) {
+			c.Writer.Header().Set(AccessControlAllowOriginHeader, accessControlAllowOrigin)
+		}
+	}
+	return func(_ *gin.Context) {}
 }

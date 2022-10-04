@@ -129,6 +129,7 @@ func TestLoadConfig(t *testing.T) {
 				CertFilePath: "/etc/ssl/certs/cert.crt",
 				KeyFilePath:  "/etc/ssl/private/private.key",
 			},
+			AccessControlAllowOrigin: "*",
 		},
 		Log: LogConfig{
 			Level:  "debug",

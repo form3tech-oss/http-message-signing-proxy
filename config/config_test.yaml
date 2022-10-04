@@ -4,6 +4,7 @@ server:
     enable: false
     certFilePath: "/etc/ssl/certs/cert.crt"
     keyFilePath: "/etc/ssl/private/private.key"
+  accessControlAllowOrigin: "*"
 
 proxy:
   upstreamTarget: "https://api.form3.tech/v1"

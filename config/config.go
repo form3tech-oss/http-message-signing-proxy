@@ -7,8 +7,9 @@ type Config struct {
 }
 
 type ServerConfig struct {
-	Port int       `mapstructure:"port"`
-	SSL  SSLConfig `mapstructure:"ssl"`
+	Port                     int       `mapstructure:"port"`
+	SSL                      SSLConfig `mapstructure:"ssl"`
+	AccessControlAllowOrigin string    `mapstructure:"accessControlAllowOrigin"`
 }
 
 type ProxyConfig struct {
