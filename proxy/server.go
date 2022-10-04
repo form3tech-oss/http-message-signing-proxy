@@ -33,6 +33,7 @@ func NewServer(cfg config.ServerConfig, handler Handler, metric MetricPublisher)
 	router.NoRoute(
 		RecoverMiddleware(metric),
 		LogAndMetricsMiddleware(metric),
+		CORSMiddleware(cfg.AccessControlAllowOrigin),
 		handler.ForwardRequest,
 	)
 

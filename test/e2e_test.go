@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/form3tech-oss/go-http-message-signatures"
+	httpsignatures "github.com/form3tech-oss/go-http-message-signatures"
 	"github.com/form3tech-oss/http-message-signing-proxy/cmd"
 	"github.com/stretchr/testify/suite"
 )
@@ -37,6 +37,7 @@ const (
 
 type e2eTestSuite struct {
 	suite.Suite
+	accessControlAllowOrigin string
 }
 
 func (s *e2eTestSuite) msgVerifier() *httpsignatures.MessageVerifier {
@@ -86,10 +87,11 @@ func (s *e2eTestSuite) runProxy(upstreamTarget string) {
 	rootCmd.SetArgs(append(
 		[]string{"--config", cfgFile},
 		genSetFlags(map[string]string{
-			"server.ssl.certFilePath":  sslCertFile,
-			"server.ssl.keyFilePath":   sslKeyFile,
-			"proxy.signer.keyFilePath": privateKeyFile,
-			"proxy.upstreamTarget":     upstreamTarget,
+			"server.ssl.certFilePath":         sslCertFile,
+			"server.ssl.keyFilePath":          sslKeyFile,
+			"proxy.signer.keyFilePath":        privateKeyFile,
+			"proxy.upstreamTarget":            upstreamTarget,
+			"server.accessControlAllowOrigin": s.accessControlAllowOrigin,
 		})...,
 	))
 	go func() {
@@ -167,6 +169,7 @@ func (s *e2eTestSuite) TestProxy() {
 			r, err := http.DefaultClient.Do(req)
 			s.NoError(err)
 			s.Equal(test.expectedStatus, r.StatusCode)
+			s.Equal(s.accessControlAllowOrigin, r.Header.Get("Access-Control-Allow-Origin"))
 
 			if test.expectedStatus == http.StatusOK {
 				resp, err := readHttpResp[successResp](r)
@@ -186,7 +189,7 @@ func (s *e2eTestSuite) TestProxy() {
 }
 
 func TestE2ETestSuite(t *testing.T) {
-	suite.Run(t, new(e2eTestSuite))
+	suite.Run(t, &e2eTestSuite{accessControlAllowOrigin: "*"})
 }
 
 func genSetFlags(m map[string]string) []string {

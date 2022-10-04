@@ -11,6 +11,8 @@ server:
     certFilePath: "/etc/ssl/certs/cert.crt"
     # Location of the proxy's private key, if SSL is enabled
     keyFilePath: "/etc/ssl/private/private.key"
+  # Value to be used in the Access-Control-Allow-Origin response header
+  accessControlAllowOrigin: "*"
 
 # Request forward proxy config
 proxy:

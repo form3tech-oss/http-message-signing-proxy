@@ -84,6 +84,69 @@ func TestHandler(t *testing.T) {
 	}
 }
 
+func TestHandlerCORS(t *testing.T) {
+	tests := []struct {
+		name                     string
+		accessControlAllowOrigin string
+	}{
+		{
+			"no value",
+			"",
+		},
+		{
+			"*",
+			"*",
+		},
+		{
+			"single domain",
+			"https://test",
+		},
+	}
+
+	expectedRespBody := "OK"
+	mockURL := "mock"
+	mockCtrl := gomock.NewController(t)
+	defer mockCtrl.Finish()
+
+	// Mock dependencies
+	mockReqSigner := mockReqSigner(mockCtrl)
+	mockMetricPublisher := mockMetricPublisher(mockCtrl, mockURL)
+
+	// Test upstream target that returns 200 OK
+	targetSrv := testTargetServer(expectedRespBody)
+
+	// Reverse proxy pointing to test target
+	rs, err := NewReverseProxy(targetSrv.URL)
+	require.NoError(t, err)
+
+	// Test handler
+	var w *test.TestResponseRecorder
+
+	for _, tt := range tests {
+		h := NewHandler(rs, mockReqSigner, mockMetricPublisher)
+		_, e := gin.CreateTestContext(w)
+		e.NoRoute(
+			RecoverMiddleware(mockMetricPublisher),
+			LogAndMetricsMiddleware(mockMetricPublisher),
+			CORSMiddleware(tt.accessControlAllowOrigin),
+			h.ForwardRequest,
+		)
+
+		t.Run(tt.name, func(t *testing.T) {
+			w = test.NewTestResponseRecorder()
+
+			// Test request
+			req, err := http.NewRequest(http.MethodGet, mockURL, nil)
+			require.NoError(t, err)
+
+			e.ServeHTTP(w, req)
+
+			require.Equal(t, http.StatusOK, w.Code)
+			require.Equal(t, w.Header().Get(AccessControlAllowOriginHeader), tt.accessControlAllowOrigin)
+		})
+	}
+}
+
 func mockReqSigner(mockCtrl *gomock.Controller) *MockRequestSigner {
 	mockReqSigner := NewMockRequestSigner(mockCtrl)
 	mockReqSigner.EXPECT().SignRequest(gomock.Any()).DoAndReturn(func(r *http.Request) (*http.Request, error) {
